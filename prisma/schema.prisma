@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Cafe {
+  id           String   @id @default(cuid())
+  name         String
+  slug         String   @unique
+  description  String
+  address      String
+  city         String
+  phone        String
+  whatsapp     String
+  email        String
+  openingHours String
+  heroTitle    String
+  heroSubtitle String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Category {
+  id           String     @id @default(cuid())
+  name         String
+  slug         String     @unique
+  displayOrder Int        @default(0)
+  menuItems    MenuItem[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model MenuItem {
+  id          String      @id @default(cuid())
+  name        String
+  slug        String      @unique
+  description String
+  price       Float
+  imageUrl    String?
+  videoUrl    String?
+  isVeg       Boolean     @default(true)
+  isAvailable Boolean     @default(true)
+  isFeatured  Boolean     @default(false)
+  categoryId  String
+  category    Category    @relation(fields: [categoryId], references: [id])
+  orderItems  OrderItem[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([categoryId])
+  @@index([isAvailable])
+  @@index([isFeatured])
+}
+
+model TableSession {
+  id          String             @id @default(cuid())
+  tableNumber String
+  status      TableSessionStatus @default(ACTIVE)
+  orders      Order[]
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  closedAt    DateTime?
+
+  @@index([tableNumber])
+  @@index([status])
+}
+
+model Order {
+  id            String        @id @default(cuid())
+  tableNumber   String
+  customerName  String?
+  customerPhone String?
+  status        OrderStatus   @default(PENDING)
+  totalAmount   Float
+  notes         String?
+  sessionId     String?
+  session       TableSession? @relation(fields: [sessionId], references: [id])
+  items         OrderItem[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([sessionId])
+  @@index([tableNumber])
+}
+
+model OrderItem {
+  id         String   @id @default(cuid())
+  orderId    String
+  menuItemId String
+  itemName   String
+  unitPrice  Float
+  quantity   Int
+  lineTotal  Float
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
+
+  @@index([orderId])
+  @@index([menuItemId])
+}
+
+model WaiterCall {
+  id          String           @id @default(cuid())
+  tableNumber String
+  status      WaiterCallStatus @default(OPEN)
+  message     String?
+  createdAt   DateTime         @default(now())
+  resolvedAt  DateTime?
+
+  @@index([tableNumber])
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum WaiterCallStatus {
+  OPEN
+  RESOLVED
+}
+
+enum TableSessionStatus {
+  ACTIVE
+  CLOSED
+}
+
+enum OrderStatus {
+  PENDING
+  PREPARING
+  READY
+  COMPLETED
+  CANCELLED
+}
