@@ -1,17 +1,35 @@
 import Link from "next/link";
 import QRCode from "qrcode";
+import { headers } from "next/headers";
 import { requireAdmin } from "@/lib/auth";
 
 const TABLE_COUNT = 10;
 
-function getBaseUrl() {
-  return process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+async function getBaseUrl() {
+  const configuredUrl = process.env.NEXT_PUBLIC_APP_URL?.trim();
+
+  if (configuredUrl && !configuredUrl.includes("localhost")) {
+    return configuredUrl.replace(/\/$/, "");
+  }
+
+  const requestHeaders = await headers();
+
+  const host =
+    requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
+
+  const protocol = requestHeaders.get("x-forwarded-proto") ?? "https";
+
+  if (!host) {
+    return "https://big-star-cafe-zeta.vercel.app";
+  }
+
+  return `${protocol}://${host}`.replace(/\/$/, "");
 }
 
 export default async function AdminQrPage() {
   await requireAdmin();
 
-  const baseUrl = getBaseUrl();
+  const baseUrl = await getBaseUrl();
 
   const qrCodes = await Promise.all(
     Array.from({ length: TABLE_COUNT }, async (_, index) => {
@@ -60,13 +78,6 @@ export default async function AdminQrPage() {
           >
             Back to Dashboard
           </Link>
-
-          <button
-            onClick={undefined}
-            className="hidden rounded-full bg-[#005340] px-5 py-3 font-black text-[#F4EEDA]"
-          >
-            Print
-          </button>
         </div>
 
         <section className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
