@@ -23,11 +23,11 @@ export default function Footer() {
             </h4>
 
             <ul className="space-y-2 text-white/70">
-              <li>Home</li>
-              <li>Menu</li>
-              <li>QR Ordering</li>
-              <li>Featured Items</li>
-              <li>Contact</li>
+              <li><a href="/">Home</a></li>
+              <li><a href="/menu">Menu</a></li>
+              <li><a href="/qr-ordering">QR Ordering</a></li>
+              <li><a href="/featured-items">Featured Items</a></li>
+              <li><a href="/contact">Contact</a></li>
             </ul>
           </div>
 
@@ -50,10 +50,10 @@ export default function Footer() {
             </h4>
 
             <ul className="space-y-2 text-white/70">
-              <li>Instagram</li>
-              <li>Facebook</li>
-              <li>Google Maps</li>
-              <li>WhatsApp</li>
+              <li><a href="" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+              <li><a href="" target="_blank" rel="noopener noreferrer">Facebook</a></li>
+              <li><a href="https://maps.google.com/?q=Big+Star+Cafe,+Financial+District,+Hyderabad" target="_blank" rel="noopener noreferrer">Google Maps</a></li>
+              <li><a href="" target="_blank" rel="noopener noreferrer">WhatsApp</a></li>
             </ul>
           </div>
 
